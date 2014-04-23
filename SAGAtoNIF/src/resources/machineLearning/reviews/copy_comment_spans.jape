@@ -1,0 +1,8 @@
+Phase:  CopyCommentSpan
+Input:  comment
+Options: control = all
+
+Rule: comment
+( ({comment}):span )
+-->
+:span.comment = {}

@@ -1,0 +1,32 @@
+Phase: FTTParsing
+Input: Lookup
+Options: control = appelt
+ 
+Rule: NegativeRule
+(
+ {Lookup.majorType == "negative"}
+):match
+-->
+:match.negative = {rule=NegativeRule}
+
+Rule: PositiveRule
+(
+ {Lookup.majorType == "positive"}
+):match
+-->
+:match.positive = {rule=PositiveRule}
+
+Rule: LocationRule
+(
+ {Lookup.majorType == "location"}
+):match
+-->
+:match.location = {rule=LocationRule}
+
+Rule: CRule
+(
+ {Lookup.majorType == "cashtag"}
+):match
+-->
+:match.cashtag = {rule=CRule}
+

@@ -1,0 +1,67 @@
+Phase: FTTParsing
+Input: Lookup
+Options: control = appelt
+ 
+Rule: NegativeRule
+(
+ {Lookup.majorType == "negative"}
+):match
+-->
+:match.negative = {rule=NegativeRule}
+
+Rule: PositiveRule
+(
+ {Lookup.majorType == "positive"}
+):match
+-->
+:match.positive = {rule=PositiveRule}
+
+Rule: NeutralRule
+(
+ {Lookup.majorType == "neutral"}
+):match
+-->
+:match.neutral = {rule=NeutralRule}
+
+Rule: LocationRule
+(
+ {Lookup.majorType == "location"}
+):match
+-->
+:match.location = {rule=LocationRule}
+
+Rule: CRule
+(
+ {Lookup.majorType == "cashtags"}
+):match
+-->
+:match.cashtags = {rule=CRule}
+
+Rule: UncertaintyRule
+(
+ {Lookup.majorType == "uncertainty"}
+):match
+-->
+:match.uncertainty = {rule=UncertaintyRule}
+
+Rule: LitigiousnessRule
+(
+ {Lookup.majorType == "litigiousness"}
+):match
+-->
+:match.litigiousness = {rule=LitigiousnessRule}
+
+Rule: Weak_modalRule
+(
+ {Lookup.majorType == "weak_modal"}
+):match
+-->
+:match.weak_modal = {rule=Weak_modalRule}
+
+Rule: Strong_modalRule
+(
+ {Lookup.majorType == "strong_modal"}
+):match
+-->
+:match.strong_modal = {rule=Strong_modalRule}
+

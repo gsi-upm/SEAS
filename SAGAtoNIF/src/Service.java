@@ -116,10 +116,37 @@ public class Service extends HttpServlet {
 		String forward="";
 		String eurosentiment="";
 		HttpResponse responseMARL = null;
+		HttpSession session =request.getSession();
+		RequestDispatcher view;
 	    // Get a map of the request parameters
 	    @SuppressWarnings("unchecked")
 	    Map parameters = request.getParameterMap();
 	    if (parameters.containsKey("input")){
+	    	if(parameters.containsKey("intype") && parameters.containsKey("informat") && parameters.containsKey("outformat")){
+	    		if(!request.getParameter("intype").equalsIgnoreCase("direct")){
+	    			  forward = RESPONSE_JSP;
+	    		      eurosentiment = "intype should be direct";
+	    	  		  session.setAttribute("eurosentiment", eurosentiment);
+	    	  		  view = request.getRequestDispatcher(forward);
+	    	  		  view.forward(request, response);
+	    	  		  return;
+	    		}
+	    		if(!request.getParameter("informat").equalsIgnoreCase("text")){
+	    			  forward = RESPONSE_JSP;
+	    		      eurosentiment = "informat should be text";
+	    	  		  session.setAttribute("eurosentiment", eurosentiment);
+	    	  		  view = request.getRequestDispatcher(forward);
+	    	  		  view.forward(request, response);
+	    	  		  return;
+	    		}
+	    		if(!request.getParameter("outformat").equalsIgnoreCase("json-ld")){
+	    			  forward = RESPONSE_JSP;
+	    		      eurosentiment = "outformat should be json-ld";
+	    	  		  session.setAttribute("eurosentiment", eurosentiment);
+	    	  		  view = request.getRequestDispatcher(forward);
+	    	  		  view.forward(request, response);
+	    	  		  return;
+	    		}
 	    	//Check that in not url or the other type
 		  forward = RESPONSE_JSP;
 		  String textToAnalize = request.getParameter("input");
@@ -182,7 +209,6 @@ public class Service extends HttpServlet {
             			marl.append("\n");
             		}
             		in.close();
-            		HttpSession session =request.getSession();
             		eurosentiment = marl.toString();
             		session.setAttribute("eurosentiment", eurosentiment);
            
@@ -193,10 +219,17 @@ public class Service extends HttpServlet {
   			} catch(Exception e){
   				System.out.println("It does not execute.");
   			}
+	    	} else {
+	    		forward = RESPONSE_JSP;
+	  	      	eurosentiment = "There is no intype, informat or outformat especified";
+	    		session.setAttribute("eurosentiment", eurosentiment);
+	    	}
 	    } else {
-	      forward = SERVICE_JSP;
+	      forward = RESPONSE_JSP;
+	      eurosentiment = "There is no input";
+  		  session.setAttribute("eurosentiment", eurosentiment);
 	    }
-	    RequestDispatcher view = request.getRequestDispatcher(forward);
+	    view = request.getRequestDispatcher(forward);
 	    view.forward(request, response);
 
 	}

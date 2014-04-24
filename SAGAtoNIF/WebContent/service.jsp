@@ -4,13 +4,14 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<title>Insert title here</title>
+<title>SAGAtoNIF</title>
 </head>
 <body>
 	<form method="POST" action='Service' name="service">
     	<input type="text" class="form-control" name="input" value="Insert your spanish financial and emoticon text here." style="height: 122px; width: 246px">
     	<input type="hidden" name="informat" value="text">
     	<input type="hidden" name="intype" value="direct">
+    	<input type="hidden" name="outformat" value="json-ld">
     	<p>
     	<p>
     	<input class="btn btn-success" type="submit" value="Analyze">

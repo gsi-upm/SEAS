@@ -151,6 +151,7 @@ public class Service extends HttpServlet {
 		  forward = RESPONSE_JSP;
 		  String textToAnalize = request.getParameter("input");
 		  try{
+			  //By default.
 			ArrayList<URL> dictionaries = new ArrayList<URL>();
 			dictionaries.add((new Service()).getClass().getResource("/resources/gazetteer/emoticon/lists.def"));
 			dictionaries.add((new Service()).getClass().getResource("/resources/gazetteer/finances/spanish/paradigma/lists.def"));
@@ -158,6 +159,19 @@ public class Service extends HttpServlet {
   			Corpus corpus = Factory.newCorpus("Texto web");
   			Document textoWeb = Factory.newDocument(textToAnalize);
   			corpus.add(textoWeb);
+  			if(parameters.containsKey("algo")){
+  				if(request.getParameter("algo").equalsIgnoreCase("spFinancial")){
+  					ArrayList<URL> dictionaries2 = new ArrayList<URL>();
+  					dictionaries2.add((new Service()).getClass().getResource("/resources/gazetteer/finances/spanish/paradigma/lists.def"));
+  					module = new DictionaryBasedSentimentAnalyzer("SAGA - Emoticon Sentiment Analyzer", dictionaries2);
+  				} else if(request.getParameter("algo").equalsIgnoreCase("emoticon")){
+  					ArrayList<URL> dictionaries2 = new ArrayList<URL>();
+  					dictionaries2.add((new Service()).getClass().getResource("/resources/gazetteer/emoticon/lists.def"));
+  					module = new DictionaryBasedSentimentAnalyzer("SAGA - Emoticon Sentiment Analyzer", dictionaries2);
+  				} else if(request.getParameter("algo").equalsIgnoreCase("spFinancialEmoticon")){
+  					//By default.
+  				}
+  			}
   			module.setCorpus(corpus);
   			module.execute();
             //Calling MARL generator

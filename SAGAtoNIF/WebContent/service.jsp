@@ -8,6 +8,11 @@
 </head>
 <body>
 	<form method="POST" action='Service' name="service">
+	    <select name="algo">
+  			<option value="spFinancial">Spanish financial dictionaries</option>
+ 			<option value="emoticon">Emoticons</option>
+ 			<option value="spFinancialEmoticon">Spanish financial and emoticon dictionaries</option>
+		</select> <p> <p>
     	<input type="text" class="form-control" name="input" value="Insert your spanish financial and emoticon text here." style="height: 122px; width: 246px">
     	<input type="hidden" name="informat" value="text">
     	<input type="hidden" name="intype" value="direct">

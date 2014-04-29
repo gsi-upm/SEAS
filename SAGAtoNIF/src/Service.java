@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
@@ -29,7 +30,6 @@ import java.util.Map;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -38,11 +38,13 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+
 
 /**
  * Servlet implementation class Service
@@ -115,11 +117,11 @@ public class Service extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String forward="";
 		String eurosentiment="";
+		HttpEntity entity = null;
 		HttpResponse responseMARL = null;
 		HttpSession session =request.getSession();
 		RequestDispatcher view;
 	    // Get a map of the request parameters
-	    @SuppressWarnings("unchecked")
 	    Map parameters = request.getParameterMap();
 	    if (parameters.containsKey("input")){
 	    	if(parameters.containsKey("intype") && parameters.containsKey("informat") && parameters.containsKey("outformat")){
@@ -151,65 +153,29 @@ public class Service extends HttpServlet {
 		  forward = RESPONSE_JSP;
 		  String textToAnalize = request.getParameter("input");
 		  try{
-			  //By default.
-			ArrayList<URL> dictionaries = new ArrayList<URL>();
-			dictionaries.add((new Service()).getClass().getResource("/resources/gazetteer/emoticon/lists.def"));
-			dictionaries.add((new Service()).getClass().getResource("/resources/gazetteer/finances/spanish/paradigma/lists.def"));
-			DictionaryBasedSentimentAnalyzer module = new DictionaryBasedSentimentAnalyzer("SAGA - Emoticon Sentiment Analyzer", dictionaries);
-  			Corpus corpus = Factory.newCorpus("Texto web");
-  			Document textoWeb = Factory.newDocument(textToAnalize);
-  			corpus.add(textoWeb);
   			if(parameters.containsKey("algo")){
   				if(request.getParameter("algo").equalsIgnoreCase("spFinancial")){
-  					ArrayList<URL> dictionaries2 = new ArrayList<URL>();
-  					dictionaries2.add((new Service()).getClass().getResource("/resources/gazetteer/finances/spanish/paradigma/lists.def"));
-  					module = new DictionaryBasedSentimentAnalyzer("SAGA - Emoticon Sentiment Analyzer", dictionaries2);
+  					ArrayList<URL> dictionaries = new ArrayList<URL>();
+  					dictionaries.add((new Service()).getClass().getResource("/resources/gazetteer/finances/spanish/paradigma/lists.def"));
+  					entity = callSAGA(textToAnalize, dictionaries);
   				} else if(request.getParameter("algo").equalsIgnoreCase("emoticon")){
-  					ArrayList<URL> dictionaries2 = new ArrayList<URL>();
-  					dictionaries2.add((new Service()).getClass().getResource("/resources/gazetteer/emoticon/lists.def"));
-  					module = new DictionaryBasedSentimentAnalyzer("SAGA - Emoticon Sentiment Analyzer", dictionaries2);
+  					ArrayList<URL> dictionaries = new ArrayList<URL>();
+  					dictionaries.add((new Service()).getClass().getResource("/resources/gazetteer/emoticon/lists.def"));
+  					entity = callSAGA(textToAnalize, dictionaries);
   				} else if(request.getParameter("algo").equalsIgnoreCase("spFinancialEmoticon")){
-  					//By default.
+  					ArrayList<URL> dictionaries = new ArrayList<URL>();
+  					dictionaries.add((new Service()).getClass().getResource("/resources/gazetteer/emoticon/lists.def"));
+  					dictionaries.add((new Service()).getClass().getResource("/resources/gazetteer/finances/spanish/paradigma/lists.def"));
+  					entity = callSAGA(textToAnalize, dictionaries);
+  				} else{
+  					forward = RESPONSE_JSP;
+	    		    eurosentiment = "Introduce a valid algorithm";
+	    	  		session.setAttribute("eurosentiment", eurosentiment);
+	    	  		view = request.getRequestDispatcher(forward);
+	    	  		view.forward(request, response);
+	    	  		return;
   				}
   			}
-  			module.setCorpus(corpus);
-  			module.execute();
-            //Calling MARL generator
-            HttpClient httpclient = HttpClients.createDefault();
-            HttpPost httppost = new HttpPost("http://demos.gsi.dit.upm.es/eurosentiment/marlgenerator/process");
-
-            // Request parameters and other properties.
-            ArrayList<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>(4);
-            params.add(new BasicNameValuePair("intype", "direct"));
-            params.add(new BasicNameValuePair("informat", "GALA"));
-            params.add(new BasicNameValuePair("outformat", "jsonld"));
-            StringBuffer input = new StringBuffer();
-            input.append(textToAnalize);
-            input.append("	");
-            input.append(DictionaryBasedSentimentAnalyzer.getAnalysisResult()[1]);
-            input.append("	");
-            input.append(DictionaryBasedSentimentAnalyzer.getAnalysisResult()[0]);
-            String[][] words = DictionaryBasedSentimentAnalyzer.getWordsAndValues();
-            for(int i = 0; i < words.length; i++){
-            	if(words[i][4].equals("Neutral") == false){
-            		input.append("	");
-            		input.append(words[i][0]);
-            		input.append("	");
-            		input.append(words[i][1]);
-            		input.append("	");
-            		input.append(words[i][2]);
-            		input.append("	");
-            		input.append(words[i][4]);
-            		input.append("	");
-            		input.append(words[i][3]);
-            	}
-            }
-            params.add(new BasicNameValuePair("input", input.toString()));
-            httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-
-            //Execute and get the response.
-            responseMARL = httpclient.execute(httppost);
-            HttpEntity entity = responseMARL.getEntity();
 
             if (entity != null) {
                 InputStream instream = entity.getContent();
@@ -231,7 +197,7 @@ public class Service extends HttpServlet {
                 }
             }
   			} catch(Exception e){
-  				System.out.println("It does not execute.");
+  				System.err.println(e);
   			}
 	    	} else {
 	    		forward = RESPONSE_JSP;
@@ -246,6 +212,53 @@ public class Service extends HttpServlet {
 	    view = request.getRequestDispatcher(forward);
 	    view.forward(request, response);
 
+	}
+	public static HttpEntity callMarl(String textToAnalize, String[][] words, String[] polarityAndValue) throws UnsupportedEncodingException, IOException, ClientProtocolException{
+		//Calling MARL generator
+        HttpClient httpclient = HttpClients.createDefault();
+        HttpPost httppost = new HttpPost("http://demos.gsi.dit.upm.es/eurosentiment/marlgenerator/process");
+
+        // Request parameters and other properties.
+        ArrayList<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>(4);
+        params.add(new BasicNameValuePair("intype", "direct"));
+        params.add(new BasicNameValuePair("informat", "GALA"));
+        params.add(new BasicNameValuePair("outformat", "jsonld"));
+        StringBuffer input = new StringBuffer();
+        input.append(textToAnalize);
+        input.append("	");
+        input.append(polarityAndValue[1]);
+        input.append("	");
+        input.append(polarityAndValue[0]);
+        for(int i = 0; i < words.length; i++){
+        	if(words[i][4].equals("Neutral") == false){
+        		input.append("	");
+        		input.append(words[i][0]);
+        		input.append("	");
+        		input.append(words[i][1]);
+        		input.append("	");
+        		input.append(words[i][2]);
+        		input.append("	");
+        		input.append(words[i][4]);
+        		input.append("	");
+        		input.append(words[i][3]);
+        	}
+        }
+        params.add(new BasicNameValuePair("input", input.toString()));
+        httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+
+        //Execute and get the response.
+        HttpResponse responseMARL = httpclient.execute(httppost);
+        return responseMARL.getEntity();
+	}
+	
+	public static HttpEntity callSAGA(String textToAnalize, ArrayList<URL> dictionaries) throws Exception{
+		DictionaryBasedSentimentAnalyzer module = new DictionaryBasedSentimentAnalyzer("SAGA - Sentiment Analyzer", dictionaries);
+		Corpus corpus = Factory.newCorpus("Texto web");
+		Document textoWeb = Factory.newDocument(textToAnalize + " ");
+		corpus.add(textoWeb);
+		module.setCorpus(corpus);
+		module.execute();
+		return callMarl(textToAnalize, DictionaryBasedSentimentAnalyzer.getWordsAndValues(), DictionaryBasedSentimentAnalyzer.getAnalysisResult());
 	}
 
 }

@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
@@ -56,6 +57,7 @@ public class Service extends HttpServlet {
 	
 	private static String SERVICE_JSP = "/service.jsp";
 	private static String RESPONSE_JSP = "/response.jsp";
+	private static HashMap<String,DictionaryBasedSentimentAnalyzer> modules = new HashMap<String, DictionaryBasedSentimentAnalyzer>();
 	
     /**
      * Default constructor. 
@@ -92,7 +94,20 @@ public class Service extends HttpServlet {
                     ctx.getResource("/WEB-INF/plugins/processingResources")); 
             Gate.getCreoleRegister().registerDirectories( 
                     ctx.getResource("/WEB-INF/plugins/webProcessingResources")); 
-     
+            
+            ArrayList<URL> dictionaries = new ArrayList<URL>();
+			dictionaries.add((new Service()).getClass().getResource("/resources/gazetteer/finances/spanish/paradigma/lists.def"));
+            modules.put("spFinancial", new DictionaryBasedSentimentAnalyzer("SAGA - Sentiment Analyzer", dictionaries));
+            
+            ArrayList<URL> dictionaries2 = new ArrayList<URL>();
+            dictionaries2.add((new Service()).getClass().getResource("/resources/gazetteer/emoticon/lists.def"));           
+            modules.put("emoticon", new DictionaryBasedSentimentAnalyzer("SAGA - Sentiment Analyzer", dictionaries2));
+            
+            ArrayList<URL> dictionaries3 = new ArrayList<URL>();
+			dictionaries3.add((new Service()).getClass().getResource("/resources/gazetteer/finances/spanish/paradigma/lists.def"));
+            dictionaries3.add((new Service()).getClass().getResource("/resources/gazetteer/emoticon/lists.def"));           
+            modules.put("spFinancialEmoticon", new DictionaryBasedSentimentAnalyzer("SAGA - Sentiment Analyzer", dictionaries3));
+
             gateInited = true; 
           
         } 
@@ -118,7 +133,6 @@ public class Service extends HttpServlet {
 		String forward="";
 		String eurosentiment="";
 		HttpEntity entity = null;
-		HttpResponse responseMARL = null;
 		HttpSession session =request.getSession();
 		RequestDispatcher view;
 	    // Get a map of the request parameters
@@ -155,18 +169,11 @@ public class Service extends HttpServlet {
 		  try{
   			if(parameters.containsKey("algo")){
   				if(request.getParameter("algo").equalsIgnoreCase("spFinancial")){
-  					ArrayList<URL> dictionaries = new ArrayList<URL>();
-  					dictionaries.add((new Service()).getClass().getResource("/resources/gazetteer/finances/spanish/paradigma/lists.def"));
-  					entity = callSAGA(textToAnalize, dictionaries);
+  					entity = callSAGA(textToAnalize, "spFinancial");
   				} else if(request.getParameter("algo").equalsIgnoreCase("emoticon")){
-  					ArrayList<URL> dictionaries = new ArrayList<URL>();
-  					dictionaries.add((new Service()).getClass().getResource("/resources/gazetteer/emoticon/lists.def"));
-  					entity = callSAGA(textToAnalize, dictionaries);
+  					entity = callSAGA(textToAnalize, "emoticon");
   				} else if(request.getParameter("algo").equalsIgnoreCase("spFinancialEmoticon")){
-  					ArrayList<URL> dictionaries = new ArrayList<URL>();
-  					dictionaries.add((new Service()).getClass().getResource("/resources/gazetteer/emoticon/lists.def"));
-  					dictionaries.add((new Service()).getClass().getResource("/resources/gazetteer/finances/spanish/paradigma/lists.def"));
-  					entity = callSAGA(textToAnalize, dictionaries);
+  					entity = callSAGA(textToAnalize, "spFinancialEmoticon");
   				} else{
   					forward = RESPONSE_JSP;
 	    		    eurosentiment = "Introduce a valid algorithm";
@@ -213,6 +220,7 @@ public class Service extends HttpServlet {
 	    view.forward(request, response);
 
 	}
+	
 	public static HttpEntity callMarl(String textToAnalize, String[][] words, String[] polarityAndValue) throws UnsupportedEncodingException, IOException, ClientProtocolException{
 		//Calling MARL generator
         HttpClient httpclient = HttpClients.createDefault();
@@ -251,8 +259,8 @@ public class Service extends HttpServlet {
         return responseMARL.getEntity();
 	}
 	
-	public static HttpEntity callSAGA(String textToAnalize, ArrayList<URL> dictionaries) throws Exception{
-		DictionaryBasedSentimentAnalyzer module = new DictionaryBasedSentimentAnalyzer("SAGA - Sentiment Analyzer", dictionaries);
+	public static HttpEntity callSAGA(String textToAnalize, String algorithmName) throws Exception{
+		DictionaryBasedSentimentAnalyzer module = modules.get(algorithmName);
 		Corpus corpus = Factory.newCorpus("Texto web");
 		Document textoWeb = Factory.newDocument(textToAnalize + " ");
 		corpus.add(textoWeb);

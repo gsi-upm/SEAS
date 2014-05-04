@@ -26,46 +26,45 @@ To access the API just send a POST request to http://localhost:8080/SAGAtoNIF/Se
         
 On GNU/Linux, you can test the API using curl. A request would look like this:
 ```
-    curl --data "input=The text you want to analyze&intype=direct&informat=text&outformat=json-ld&algo=spFinancialEmoticon" http://localhost:8080/SAGAtoNIF/Service
+curl --data "input=The text you want to analyze&intype=direct&informat=text&outformat=json-ld&algo=spFinancialEmoticon" http://localhost:8080/SAGAtoNIF/Service
 ```
     
 On Java, you can test the API using HttpClient. A request would look like this:
 ```
-    HttpClient httpclient = HttpClients.createDefault();
-    HttpPost httppost = new HttpPost("http://localhost:8080/SAGAtoNIF/Service");
+HttpClient httpclient = HttpClients.createDefault();
+HttpPost httppost = new HttpPost("http://localhost:8080/SAGAtoNIF/Service");
     
-    ArrayList<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>(4);
-    params.add(new BasicNameValuePair("input", "The text that you want to analyze"));
-    params.add(new BasicNameValuePair("intype", "direct"));
-    params.add(new BasicNameValuePair("informat", "text"));
-    params.add(new BasicNameValuePair("outformat", "json-ld"));
-    params.add(new BasicNameValuePair("algo", "spFinancialEmoticon"));
+ArrayList<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>(4);
+params.add(new BasicNameValuePair("input", "The text that you want to analyze"));
+params.add(new BasicNameValuePair("intype", "direct"));
+params.add(new BasicNameValuePair("informat", "text"));
+params.add(new BasicNameValuePair("outformat", "json-ld"));
+params.add(new BasicNameValuePair("algo", "spFinancialEmoticon"));
     
-    httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     
-    //Execute and get the response.
-    HttpResponse responseService = httpclient.execute(httppost);
-    HttpEntity entity = responseService.getEntity();
+//Execute and get the response.
+HttpResponse responseService = httpclient.execute(httppost);
+HttpEntity entity = responseService.getEntity();
     
-    if (entity != null) {
-        InputStream instream = entity.getContent();
-        try {
-        BufferedReader in = new BufferedReader(new InputStreamReader(instream));
-            String inputLine;
-            StringBuffer marl = new StringBuffer();
-         
-            while ((inputLine = in.readLine()) != null) {
-        	marl.append(inputLine);
-        	marl.append("\n");
-            }
-            in.close();
-            eurosentiment = marl.toString();
-            session.setAttribute("eurosentiment", eurosentiment);
-       
-        } finally {
-        instream.close();
+if (entity != null) {
+    InputStream instream = entity.getContent();
+    try {
+    BufferedReader in = new BufferedReader(new InputStreamReader(instream));
+        String inputLine;
+        StringBuffer marl = new StringBuffer();
+     
+        while ((inputLine = in.readLine()) != null) {
+    	marl.append(inputLine);
+      	marl.append("\n");
         }
+        in.close();
+        String responseInString = marl.toString();
+        // Use responseInString as you like
+    } finally {
+    instream.close();
     }
+}
 ```
 
 An example would look like this:

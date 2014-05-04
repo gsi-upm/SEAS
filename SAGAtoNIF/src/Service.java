@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 - David Moreno Briz - Grupo de Sistemas Inteligentes - Universidad Polit?cnica de Madrid. (GSI-UPM)
+ * Copyright (c) 2014 - David Moreno Briz - Grupo de Sistemas Inteligentes - Universidad Politecnica de Madrid. (GSI-UPM)
  * http://www.gsi.dit.upm.es/
  *  
  * All rights reserved. This program and the accompanying materials
@@ -52,11 +52,27 @@ import org.apache.http.message.BasicNameValuePair;
  */
 @WebServlet("/Service")
 public class Service extends HttpServlet {
+	
 	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * To know if GATE has been initialized.
+	 */
 	private static boolean gateInited = false; 
 	
+	/**
+	 * service.jsp
+	 */
 	private static String SERVICE_JSP = "/service.jsp";
+	
+	/**
+	 * response.jsp
+	 */
 	private static String RESPONSE_JSP = "/response.jsp";
+	
+	/**
+	 * A HashMap with the configured sentiment analysis modules that are going be provided by this service.
+	 */
 	private static HashMap<String,DictionaryBasedSentimentAnalyzer> modules = new HashMap<String, DictionaryBasedSentimentAnalyzer>();
 	
     /**
@@ -66,52 +82,47 @@ public class Service extends HttpServlet {
         super();
     }
     
+    /**
+     * Method that initializes the server variables. 
+     */
     public void init() throws ServletException { 
-        if(!gateInited) { 
+        if(!gateInited) { //If GATE has been not initialized.
           try { 
+        	// GATE home is setted, so it can be used by SAGA.
             ServletContext ctx = getServletContext(); 
-     
-            // use /path/to/your/webapp/WEB-INF as gate.home 
             File gateHome = new File(ctx.getRealPath("/WEB-INF")); 
-            
-            
-     
             Gate.setGateHome(gateHome); 
-            // thus webapp/WEB-INF/plugins is the plugins directory, and 
-            // webapp/WEB-INF/gate.xml is the site config file. 
-     
-            // Use webapp/WEB-INF/user-gate.xml as the user config file, 
-            //  to avoid confusion with your own user config. 
+            // GATE user configuration file is setted. 
             Gate.setUserConfigFile(new File(gateHome, "user-gate.xml")); 
-     
+            //GATE is initialized as non visible.
             Gate.init(); 
-            // load plugins, for example... 
-            
+            // We load the plugins that are going to be used by the SAGA modules.
+            // Load ANNIE.
             Gate.getCreoleRegister().registerDirectories( 
                     ctx.getResource("/WEB-INF/plugins/ANNIE")); 
-            
+            // Load processingResources (from SAGA)
             Gate.getCreoleRegister().registerDirectories( 
-                    ctx.getResource("/WEB-INF/plugins/processingResources")); 
+                    ctx.getResource("/WEB-INF/plugins/processingResources"));
+            // Load webProcessingResources (from SAGA)
             Gate.getCreoleRegister().registerDirectories( 
                     ctx.getResource("/WEB-INF/plugins/webProcessingResources")); 
-            
+            // Now we create the sentiment analysis modules that are going to be provided by the service.
+            // Spanish financial module.
             ArrayList<URL> dictionaries = new ArrayList<URL>();
 			dictionaries.add((new Service()).getClass().getResource("/resources/gazetteer/finances/spanish/paradigma/lists.def"));
             modules.put("spFinancial", new DictionaryBasedSentimentAnalyzer("SAGA - Sentiment Analyzer", dictionaries));
-            
+            // Emoticon module.
             ArrayList<URL> dictionaries2 = new ArrayList<URL>();
             dictionaries2.add((new Service()).getClass().getResource("/resources/gazetteer/emoticon/lists.def"));           
             modules.put("emoticon", new DictionaryBasedSentimentAnalyzer("SAGA - Sentiment Analyzer", dictionaries2));
-            
+            // Spanish financial + emoticon module.
             ArrayList<URL> dictionaries3 = new ArrayList<URL>();
 			dictionaries3.add((new Service()).getClass().getResource("/resources/gazetteer/finances/spanish/paradigma/lists.def"));
             dictionaries3.add((new Service()).getClass().getResource("/resources/gazetteer/emoticon/lists.def"));           
             modules.put("spFinancialEmoticon", new DictionaryBasedSentimentAnalyzer("SAGA - Sentiment Analyzer", dictionaries3));
-
+            // GATE has been initialized.
             gateInited = true; 
-          
-        } 
-        catch(Exception ex) { 
+          }catch(Exception ex) { 
             throw new ServletException("Exception initialising GATE", ex); 
           } 
         } 
@@ -119,27 +130,30 @@ public class Service extends HttpServlet {
 
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * When the servlet receives a GET request.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		//It always returns the service.jps page.
 		RequestDispatcher view = request.getRequestDispatcher(SERVICE_JSP);
 	    view.forward(request, response);
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * When the servlet receives a POST request.
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String forward="";
-		String eurosentiment="";
+		String forward=""; // Which jsp page is going to be return.
+		String eurosentiment=""; // This is the analysis response.
+		// Auxiliar variables.
 		HttpEntity entity = null;
 		HttpSession session =request.getSession();
 		RequestDispatcher view;
 	    // Get a map of the request parameters
 	    Map parameters = request.getParameterMap();
-	    if (parameters.containsKey("input")){
-	    	if(parameters.containsKey("intype") && parameters.containsKey("informat") && parameters.containsKey("outformat")){
-	    		if(!request.getParameter("intype").equalsIgnoreCase("direct")){
+	    if (parameters.containsKey("input")){ // If the request contains a parameter named input
+	    	if(parameters.containsKey("intype") && parameters.containsKey("informat") && parameters.containsKey("outformat")){ // If the request contains a parameter named intype, informat and outformat.
+	    		if(!request.getParameter("intype").equalsIgnoreCase("direct")){ // If intype is not direct.
+	    			  // The response contains only the following message.
 	    			  forward = RESPONSE_JSP;
 	    		      eurosentiment = "intype should be direct";
 	    	  		  session.setAttribute("eurosentiment", eurosentiment);
@@ -147,7 +161,8 @@ public class Service extends HttpServlet {
 	    	  		  view.forward(request, response);
 	    	  		  return;
 	    		}
-	    		if(!request.getParameter("informat").equalsIgnoreCase("text")){
+	    		if(!request.getParameter("informat").equalsIgnoreCase("text")){ // If informat is not text
+	    			  // The response contains only the following message.
 	    			  forward = RESPONSE_JSP;
 	    		      eurosentiment = "informat should be text";
 	    	  		  session.setAttribute("eurosentiment", eurosentiment);
@@ -155,7 +170,8 @@ public class Service extends HttpServlet {
 	    	  		  view.forward(request, response);
 	    	  		  return;
 	    		}
-	    		if(!request.getParameter("outformat").equalsIgnoreCase("json-ld")){
+	    		if(!request.getParameter("outformat").equalsIgnoreCase("json-ld")){ // If outformat is not json-ld
+	    			  // The response contains only the following message.
 	    			  forward = RESPONSE_JSP;
 	    		      eurosentiment = "outformat should be json-ld";
 	    	  		  session.setAttribute("eurosentiment", eurosentiment);
@@ -163,18 +179,18 @@ public class Service extends HttpServlet {
 	    	  		  view.forward(request, response);
 	    	  		  return;
 	    		}
-	    	//Check that in not url or the other type
-		  forward = RESPONSE_JSP;
-		  String textToAnalize = request.getParameter("input");
+	      // If there is input, intype = direct, informat = text and outformat = json-ld,
+		  forward = RESPONSE_JSP; // response.jsp
+		  String textToAnalize = request.getParameter("input"); // Text to be analyzed.
 		  try{
-  			if(parameters.containsKey("algo")){
-  				if(request.getParameter("algo").equalsIgnoreCase("spFinancial")){
-  					entity = callSAGA(textToAnalize, "spFinancial");
-  				} else if(request.getParameter("algo").equalsIgnoreCase("emoticon")){
-  					entity = callSAGA(textToAnalize, "emoticon");
-  				} else if(request.getParameter("algo").equalsIgnoreCase("spFinancialEmoticon")){
-  					entity = callSAGA(textToAnalize, "spFinancialEmoticon");
-  				} else{
+  			if(parameters.containsKey("algo")){ // If the request contains a parameter named algo (algorithm)
+  				if(request.getParameter("algo").equalsIgnoreCase("spFinancial")){ // If algo = spFinancial
+  					entity = callSAGA(textToAnalize, "spFinancial"); // The corresponding GATE module is called and a MARL entity is generated.
+  				} else if(request.getParameter("algo").equalsIgnoreCase("emoticon")){ // If algo = Emoticon
+  					entity = callSAGA(textToAnalize, "emoticon"); // The corresponding GATE module is called and a MARL entity is generated.
+  				} else if(request.getParameter("algo").equalsIgnoreCase("spFinancialEmoticon")){ // If algo = spFinancialEmoticon
+  					entity = callSAGA(textToAnalize, "spFinancialEmoticon"); // The corresponding GATE module is called and a MARL entity is generated.
+  				} else{ // If the request contains a non-valid algorithm.
   					forward = RESPONSE_JSP;
 	    		    eurosentiment = "Introduce a valid algorithm";
 	    	  		session.setAttribute("eurosentiment", eurosentiment);
@@ -183,22 +199,23 @@ public class Service extends HttpServlet {
 	    	  		return;
   				}
   			}
-
+  			// If a GATE module has been called and a MARL entity has been generated.
             if (entity != null) {
+            	// The MARL entity is processed to be added to the response.jsp
                 InputStream instream = entity.getContent();
                 try {
+                	// The entity is parsed into a StringBuffer.
                 	BufferedReader in = new BufferedReader(new InputStreamReader(instream));
             		String inputLine;
             		StringBuffer marl = new StringBuffer();
-             
             		while ((inputLine = in.readLine()) != null) {
             			marl.append(inputLine);
             			marl.append("\n");
             		}
             		in.close();
+            		// The variable eurosentiment (String) is setted with the MARL response.
             		eurosentiment = marl.toString();
             		session.setAttribute("eurosentiment", eurosentiment);
-           
                 } finally {
                     instream.close();
                 }
@@ -206,12 +223,12 @@ public class Service extends HttpServlet {
   			} catch(Exception e){
   				System.err.println(e);
   			}
-	    	} else {
+	    	} else { // If there is no intype, informat or outformat specified.
 	    		forward = RESPONSE_JSP;
-	  	      	eurosentiment = "There is no intype, informat or outformat especified";
+	  	      	eurosentiment = "There is no intype, informat or outformat specified";
 	    		session.setAttribute("eurosentiment", eurosentiment);
 	    	}
-	    } else {
+	    } else { // If there is no input.
 	      forward = RESPONSE_JSP;
 	      eurosentiment = "There is no input";
   		  session.setAttribute("eurosentiment", eurosentiment);
@@ -221,6 +238,17 @@ public class Service extends HttpServlet {
 
 	}
 	
+	/**
+	 * Call MARL generator
+	 * 
+	 * @param textToAnalize The analyzed text
+	 * @param words A bidimensional array with the words in the text, their position, polarity and value.
+	 * @param polarityAndValue Polarity and value of the text.
+	 * @return MARL entity.
+	 * @throws UnsupportedEncodingException
+	 * @throws IOException
+	 * @throws ClientProtocolException
+	 */
 	public static HttpEntity callMarl(String textToAnalize, String[][] words, String[] polarityAndValue) throws UnsupportedEncodingException, IOException, ClientProtocolException{
 		//Calling MARL generator
         HttpClient httpclient = HttpClients.createDefault();
@@ -231,6 +259,7 @@ public class Service extends HttpServlet {
         params.add(new BasicNameValuePair("intype", "direct"));
         params.add(new BasicNameValuePair("informat", "GALA"));
         params.add(new BasicNameValuePair("outformat", "jsonld"));
+        // The input parameter.
         StringBuffer input = new StringBuffer();
         input.append(textToAnalize);
         input.append("	");
@@ -259,14 +288,23 @@ public class Service extends HttpServlet {
         return responseMARL.getEntity();
 	}
 	
+	/**
+	 * Execute a SAGA dictionary module and call MARL generator.
+	 * 
+	 * @param textToAnalize Text to be analyzed.
+	 * @param algorithmName The name of the sentiment analysis module.
+	 * @return MARL entity.
+	 * @throws Exception
+	 */
 	public static HttpEntity callSAGA(String textToAnalize, String algorithmName) throws Exception{
-		DictionaryBasedSentimentAnalyzer module = modules.get(algorithmName);
-		Corpus corpus = Factory.newCorpus("Texto web");
-		Document textoWeb = Factory.newDocument(textToAnalize + " ");
-		corpus.add(textoWeb);
-		module.setCorpus(corpus);
-		module.execute();
-		return callMarl(textToAnalize, DictionaryBasedSentimentAnalyzer.getWordsAndValues(), DictionaryBasedSentimentAnalyzer.getAnalysisResult());
+		DictionaryBasedSentimentAnalyzer module = modules.get(algorithmName); // The module is selected.
+		Corpus corpus = Factory.newCorpus("Texto web"); // A new corpus is created.
+		Document textoWeb = Factory.newDocument(textToAnalize + " "); // A new document is created from the text.
+		corpus.add(textoWeb); // The document is added to the corpus.
+		module.setCorpus(corpus); // The corpus is setted into the module.
+		module.execute(); // The module is executed.
+		// MARL is called.
+		return callMarl(textToAnalize, module.getWordsAndValues(), module.getAnalysisResult());
 	}
 
 }

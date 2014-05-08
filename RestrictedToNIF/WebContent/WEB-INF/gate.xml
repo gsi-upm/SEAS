@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<GATE>  
+  <GATECONFIG Save_options_on_exit="false"  
+              Save_session_on_exit="false" />  
+</GATE>

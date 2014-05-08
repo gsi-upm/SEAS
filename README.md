@@ -7,6 +7,16 @@ SEAS is a set of Sentiment and Emotion Analysis Services according to NIF. The N
 
 All of the services have been developed using Apache Tomcat 7, some of them are based in [SAGA](https://github.com/gsi-upm/SAGA) and others are based on open source projects.
 
+## Requisites
+
+These projects have been developed using the following:
+
+1. Java 7 - [Download](https://www.java.com/en/download/)
+2. Eclipse JEE - [Download](https://www.eclipse.org/downloads/packages/eclipse-ide-java-ee-developers/keplersr2)
+3. Apache Tomcat 7 - [Download](http://tomcat.apache.org/download-70.cgi) - [Setup](http://tomcat.apache.org/tomcat-7.0-doc/setup.html)
+4. MongoBD - [Download](http://www.mongodb.org/downloads) - [Setup](http://docs.mongodb.org/manual/) - [JAR](http://docs.mongodb.org/ecosystem/tutorial/getting-started-with-java-driver/)
+
+
 ## How to use the SAGAtoNIF's API
 
 To access the API just send a POST request to http://localhost:8080/SAGAtoNIF/Service with these parameters:

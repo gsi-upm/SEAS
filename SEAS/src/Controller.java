@@ -46,42 +46,44 @@ public class Controller extends HttpServlet {
      * Default constructor. 
      */
     public Controller() {
-        // TODO Auto-generated constructor stub
+        
     }
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * When the Servlet receives a GET request.
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session =request.getSession();
-		session.setAttribute("eurosentiment", "The result will be here. Analyze the example!");
-		session.setAttribute("textToAnalyze", "I feel good :)");
-		session.setAttribute("alert", "alert alert-info");
+		// Set the default variables in SentimentAnalysis.jsp
+		session.setAttribute("eurosentiment", "The result will be here. Analyze the example!"); // Example analysis result
+		session.setAttribute("textToAnalyze", "I feel good :)"); // Example text
+		session.setAttribute("alert", "alert alert-info"); // Alert box with the analysis result.
 		RequestDispatcher view;
 		view = request.getRequestDispatcher("/SentimentAnalysis.jsp");
 	    view.forward(request, response);
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * When the Servlet receives a POST request, it will call the selected service.
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String eurosentiment="";
+		String eurosentiment=""; // The result of the service will be here
 		HttpSession session =request.getSession();
-		//Calling SAGAtoNIF generator
-        HttpClient httpclient = HttpClients.createDefault();
-        HttpPost httppost = new HttpPost("http://localhost:8080/SAGAtoNIF/Service"); //Default
-        session.setAttribute("alert", "alert alert-info");
+		HttpClient httpclient = HttpClients.createDefault();
+        HttpPost httppost = new HttpPost("http://localhost:8080/SAGAtoNIF/Service"); // Default service to be call.
+        session.setAttribute("alert", "alert alert-info"); // Default result box in the jsp.
         // Request parameters and other properties.
         Map parameters = request.getParameterMap();
+        // If the request contains the needed parameters:
         if (parameters.containsKey("input") && parameters.containsKey("intype") && parameters.containsKey("informat") && parameters.containsKey("outformat") && parameters.containsKey("algo")){
-        	String algo = request.getParameter("algo");
-        	ArrayList<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>(4);
+        	String algo = request.getParameter("algo"); // Get the algorithm name.
+        	ArrayList<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>(4); // Prepare the request to the selected service.
         	params.add(new BasicNameValuePair("input", request.getParameter("input")));
         	params.add(new BasicNameValuePair("intype", request.getParameter("intype")));
         	params.add(new BasicNameValuePair("informat", request.getParameter("informat")));
         	params.add(new BasicNameValuePair("outformat", request.getParameter("outformat")));
         	params.add(new BasicNameValuePair("algo", request.getParameter("algo")));
+        	// Choose the selected service.
         	if (algo.equalsIgnoreCase("spFinancial") || algo.equalsIgnoreCase("spFinancialEmoticon") || algo.equalsIgnoreCase("Emoticon")){
         		httppost = new HttpPost("http://localhost:8080/SAGAtoNIF/Service");
         	} else if (algo.equalsIgnoreCase("enFinancial") || algo.equalsIgnoreCase("enFinancialEmoticon") || algo.equalsIgnoreCase("ANEW2010All") || algo.equalsIgnoreCase("ANEW2010Men") || algo.equalsIgnoreCase("ANEW2010Women")){
@@ -92,7 +94,7 @@ public class Controller extends HttpServlet {
         	//Execute and get the response.
         	HttpResponse responseService = httpclient.execute(httppost);
         	HttpEntity entity = responseService.getEntity();
-        
+        	// Parse the response
         	if (entity != null) {
         		InputStream instream = entity.getContent();
         		try {
@@ -100,9 +102,12 @@ public class Controller extends HttpServlet {
         		String inputLine;
         		StringBuffer marl = new StringBuffer();
         		boolean knowPolarity = false; 
+        		// Parse the service response into a String
         		while ((inputLine = in.readLine()) != null) {
         			marl.append(inputLine);
         			marl.append("\n");
+        			// Change the color of the response box depending on the polarity of the analysis.
+        			// The first "marl:Polarity" in the response will be the polarity of the text.
         			if(inputLine.contains("marl:Positive") && !knowPolarity){
         				session.setAttribute("alert", "alert alert-success");
         				knowPolarity = true;
@@ -116,7 +121,7 @@ public class Controller extends HttpServlet {
         			
         		}
         		in.close();
-        		eurosentiment = marl.toString();
+        		eurosentiment = marl.toString(); // Set the response.
         		session.setAttribute("eurosentiment", eurosentiment);
        
         		} finally {
@@ -124,7 +129,7 @@ public class Controller extends HttpServlet {
         		}
         	}
         }
-        session.setAttribute("textToAnalyze", request.getParameter("input"));
+        session.setAttribute("textToAnalyze", request.getParameter("input")); // To maintain the text in the service.
 		RequestDispatcher view;
 		view = request.getRequestDispatcher("/SentimentAnalysis.jsp");
 	    view.forward(request, response);

@@ -19,13 +19,9 @@ import java.util.Arrays;
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoCredential;
-import com.mongodb.MongoException;
-import com.mongodb.WriteConcern;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.DBCursor;
 import com.mongodb.ServerAddress;
 
 public class RestrictedParser {
@@ -82,8 +78,8 @@ public class RestrictedParser {
 	 * @param args
 	 */
 	public static void main(String[] args){
-		parseANEW("RestrictedDictionaries","ANEW2010All","/Users/David/Documents/SEAS/CreateMongoDB/bin/ANEW2010/ANEW2010All.txt");
-		parseANEW("RestrictedDictionaries","ANEW2010Men","/Users/David/Documents/SEAS/CreateMongoDB/bin/ANEW2010/ANEW2010Men.txt");
-		parseANEW("RestrictedDictionaries","ANEW2010Women","/Users/David/Documents/SEAS/CreateMongoDB/bin/ANEW2010/ANEW2010Women.txt");
+		parseANEW("RestrictedDictionaries","ANEW2010All","/path_to_ANEW2010/ANEW2010All.txt");
+		parseANEW("RestrictedDictionaries","ANEW2010Men","/path_to_ANEW2010/ANEW2010Men.txt");
+		parseANEW("RestrictedDictionaries","ANEW2010Women","/path_to_ANEW2010/ANEW2010Women.txt");
 	}
 }

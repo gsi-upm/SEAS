@@ -16,10 +16,44 @@ These projects have been developed using the following:
 3. Apache Tomcat 7 - [Download](http://tomcat.apache.org/download-70.cgi) - [Setup](http://tomcat.apache.org/tomcat-7.0-doc/setup.html)
 4. MongoBD - [Download](http://www.mongodb.org/downloads) - [Setup](http://docs.mongodb.org/manual/) - [JAR](http://docs.mongodb.org/ecosystem/tutorial/getting-started-with-java-driver/)
 
+### Setup Tomcat in Eclipse
 
-## How to use the SAGAtoNIF's API
+In Eclipse go to Preferences -> Server -> RunTime Enviroments -> Add -> Apache -> Apache Tomcat 7.0 -> Select path to Tomcat installation -> Finish
 
-To access the API just send a POST request to http://localhost:8080/SAGAtoNIF/Service with these parameters:
+### Set up CretateMongoBD project
+
+1. Import the project into Eclipse.
+2. Download [mongo.jar](http://docs.mongodb.org/ecosystem/tutorial/getting-started-with-java-driver/) and add it to the project's library.
+3. Go to [http://csea.phhp.ufl.edu/media/anewmessage.html](http://csea.phhp.ufl.edu/media/anewmessage.html) and make a request for Affective Norms for English Words so they provide you with the dictionaries, which are only abaliable for accademic purposes.
+4. Configure the project with your MongoBD and with the path to the dictionaries.
+5. Execute the project As a Java Application to parse ANEW into your MongoBD.
+
+### Set up RestrictedToNIF project
+
+1. Import the project into Eclipse.
+2. Add Tomcat Libraries into the project.
+3. Configure your MongoDB installation in the code.
+4. Go to [http://www3.nd.edu/~mcdonald/Word_Lists.html](http://www3.nd.edu/~mcdonald/Word_Lists.html) to get these financial dictionaries, which are not abaliable for commercial use without authorization.
+5. Put these dictionaries in [GATE](https://gate.ac.uk) format. (See the [dictionary format](https://github.com/gsi-upm/SEAS/tree/master/SAGAtoNIF/src/resources/gazetteer/finances/spanish/paradigma) used in SAGAtoNIF as an example of how to do it)
+6. Run As Server.
+
+### Set up SAGAToNIF project
+
+1. Import the project into Eclipse.
+2. Add Tomcat Libraries into the project.
+3. Run As Server.
+
+### Set up SEAS project
+
+1. Import the project into Eclipse.
+2. Add Tomcat Libraries into the project.
+3. Run As Server.
+
+Now you can use the service via SEAS web service or console.
+
+## How to use the SAGAtoNIF's or RestrictedToNIF's API
+
+To access the API just send a POST request to http://localhost:8080/SAGAtoNIF/Service or to http://localhost:8080/RestrictedToNIF/RestrictedService with these parameters:
     
     input:
         The original file to be translated
@@ -30,9 +64,14 @@ To access the API just send a POST request to http://localhost:8080/SAGAtoNIF/Se
     outformat:
         json-ld
     algo:
-        spFinancial
-        emoticon
-        spFinancialEmoticon
+        spFinancial (SAGAtoNIF service)
+        emoticon (SAGAtoNIF service)
+        spFinancialEmoticon (SAGAtoNIF service)
+        enFinancial (RestrictedToNIF service)
+        enFinancialEmoticon (RestrictedToNIF service)
+        ANEW2010Women (RestrictedToNIF service)
+        ANEW2010Men (RestrictedToNIF service)
+        ANEW2010All (RestrictedToNIF service)
         
 On GNU/Linux, you can test the API using curl. A request would look like this:
 ```

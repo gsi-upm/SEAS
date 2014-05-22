@@ -1,9 +1,10 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10/jquery.min.js"></script>
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+<link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
 <title>SEAS</title>
 <style type="text/css">
 body
@@ -14,8 +15,8 @@ padding-bottom:50px;
 
 #footer{
 	position:fixed;
-    height:50px;
-    background-color:black;
+    height:90px;
+    background-color:#303030;
     bottom:0px;
     left:0px;
     right:0px;
@@ -23,7 +24,7 @@ padding-bottom:50px;
 }
 
 #eurosentiment{
-    margin-bottom:60px;
+    margin-bottom:100px;
 }
 
 

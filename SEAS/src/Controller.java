@@ -30,6 +30,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
@@ -68,6 +69,7 @@ public class Controller extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String eurosentiment=""; // The result of the service will be here
+		HttpEntity entity = null;
 		HttpSession session =request.getSession();
 		HttpClient httpclient = HttpClients.createDefault();
         HttpPost httppost = new HttpPost("http://localhost:8080/SAGAtoNIF/Service"); // Default service to be call.
@@ -86,14 +88,24 @@ public class Controller extends HttpServlet {
         	// Choose the selected service.
         	if (algo.equalsIgnoreCase("spFinancial") || algo.equalsIgnoreCase("spFinancialEmoticon") || algo.equalsIgnoreCase("Emoticon")){
         		httppost = new HttpPost("http://localhost:8080/SAGAtoNIF/Service");
+        		httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+            	//Execute and get the response.
+            	HttpResponse responseService = httpclient.execute(httppost);
+            	entity = responseService.getEntity();
         	} else if (algo.equalsIgnoreCase("enFinancial") || algo.equalsIgnoreCase("enFinancialEmoticon") || algo.equalsIgnoreCase("ANEW2010All") || algo.equalsIgnoreCase("ANEW2010Men") || algo.equalsIgnoreCase("ANEW2010Women")){
         		httppost = new HttpPost("http://localhost:8080/RestrictedToNIF/RestrictedService");
+        		httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+            	//Execute and get the response.
+            	HttpResponse responseService = httpclient.execute(httppost);
+            	entity = responseService.getEntity();
+        	} else if (algo.equalsIgnoreCase("onyx")){
+        		HttpGet httpget = new HttpGet("http://demos.gsi.dit.upm.es/onyxemote/emote.php?i=" + (request.getParameter("input")).replace(' ', '+') + "&o=jsonld");
+            	//Execute and get the response.
+            	HttpResponse responseService = httpclient.execute(httpget);
+            	entity = responseService.getEntity();
+            	session.setAttribute("alert", "alert alert-warning");
         	}
         	
-        	httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-        	//Execute and get the response.
-        	HttpResponse responseService = httpclient.execute(httppost);
-        	HttpEntity entity = responseService.getEntity();
         	// Parse the response
         	if (entity != null) {
         		InputStream instream = entity.getContent();

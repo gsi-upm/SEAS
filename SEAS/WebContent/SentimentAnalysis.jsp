@@ -6,7 +6,7 @@
 <body>
 
 <div class="col-md-1"></div>
-<div class="col-md-3">
+<div id="info" class="col-md-3">
 <form method="POST" action='Controller' name="controller">
 	    <select class="input-group" name="algo">
   			<option value="spFinancial">Sentiment dictionary - Spanish finances - Paradigma</option>
@@ -27,8 +27,11 @@
 	<hr>
 	<p align="justify"><font color="#F8F8F8">SEAS is a set of Sentiment and Emotion Analysis Services according to <a href="http://persistence.uni-leipzig.org/nlp2rdf/"><font color="#D0D0D0">NIF</font></a>. The NLP Interchange Format (NIF) is an RDF/OWL-based format that aims to achieve interoperability between Natural Language Processing (NLP) tools, language resources and annotations.</font><p><p>
 	<p align="justify"><font color="#F8F8F8"><i class="fa fa-arrow-right" ></i> Sentiment analysis is generated in <a href="http://www.gi2mo.org/marl/0.1/ns.html"><font color="#D0D0D0">Marl</font></a>.</font><p><p>
-	<p align="justify"><font color="#F8F8F8"><i class="fa fa-arrow-right" ></i> Emotion analysis is generated in <a href="http://www.gsi.dit.upm.es/ontologies/onyx/"><font color="#D0D0D0">Onyx</font></a>.</font><p>
+	<p align="justify"><font color="#F8F8F8"><i class="fa fa-arrow-right" ></i> Emotion analysis is generated in <a href="http://www.gsi.dit.upm.es/ontologies/onyx/"><font color="#D0D0D0">Onyx</font></a>.</font><p><p>
 	<p align="justify"><font color="#F8F8F8"><i class="fa fa-arrow-right" ></i> Check out our project in <a href="https://github.com/gsi-upm/SEAS"><font color="#D0D0D0">GitHub</font></a>.</font><p>
+	<p align="justify"><font color="#F8F8F8"><i class="fa fa-arrow-right" ></i> Financial sentiment dictionaries used:</font><p><p>
+	<p align="left" style="text-indent: 2em;"><font color="#F8F8F8"><i class="fa fa-hand-o-right" ></i> <a href="http://en.paradigmatecnologico.com"><font color="#D0D0D0">Paradigma</font></a>.</font><p><p>
+	<p align="left" style="text-indent: 2em;"><font color="#F8F8F8"><i class="fa fa-hand-o-right" ></i> <a href="http://www3.nd.edu/%7Emcdonald/Word_Lists.html"><font color="#D0D0D0">Loughran and McDonald</font></a>.</font><p>
 </div>
   <div class="col-md-1"></div>
   <div class="col-md-6">
@@ -39,6 +42,6 @@
 
 </body>
 <footer id="footer">
-<font color="#F8F8F8">Brought to you by </font><a href="http://www.gsi.dit.upm.es/index.php/en.html"><img src="http://demos.gsi.dit.upm.es/eurosentiment/static/eurosentiment/img/logo-gsi.png" height="90px"></a><font color="#F8F8F8"></font><img src="http://demos.gsi.dit.upm.es/eurosentiment/static/eurosentiment/img/logo.png" height="90px">
+<p align="left" style="text-indent: 1em;"><font color="#F8F8F8">Brought to you by:</font><a href="http://www.gsi.dit.upm.es/index.php/en.html"><img src="http://demos.gsi.dit.upm.es/sefarad/img/logo_gsi.png" height="90px" style="margin-left:5px; margin-right:5px;"></a><font color="#F8F8F8"></font><a href="http://eurosentiment.eu"><img src="http://demos.gsi.dit.upm.es/eurosentiment/static/eurosentiment/img/logo.png" height="90px" style="margin-left:5px; margin-right:5px;"></a>
 </footer>
 </html>

@@ -27,6 +27,10 @@ padding-bottom:50px;
     margin-bottom:100px;
 }
 
+#info{
+    margin-bottom:100px;
+}
+
 
 /* Set the fixed height of the footer here */
 

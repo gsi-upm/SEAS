@@ -74,6 +74,7 @@ public class Controller extends HttpServlet {
 		HttpClient httpclient = HttpClients.createDefault();
         HttpPost httppost = new HttpPost("http://localhost:8080/SAGAtoNIF/Service"); // Default service to be call.
         session.setAttribute("alert", "alert alert-info"); // Default result box in the jsp.
+        session.setAttribute("eurosentiment", "Sorry, there is no response from the service."); // Default response, in case the service does not work.
         // Request parameters and other properties.
         Map parameters = request.getParameterMap();
         // If the request contains the needed parameters:

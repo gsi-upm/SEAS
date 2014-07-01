@@ -53,10 +53,12 @@ Now you can use the service via SEAS web service or console.
 
 ## How to use the SAGAtoNIF's or RestrictedToNIF's API
 
-You can go to 
+You can go [here](http://demos.gsi.dit.upm.es/tomcat/SEAS/Controller) to see a demo and test the service.
 
-To access the API just send a POST request to http://localhost:8080/SAGAtoNIF/Service or to http://localhost:8080/RestrictedToNIF/RestrictedService with these parameters:
-    
+To access the API just send a POST request to:
+1. (If you are in local mode) http://localhost:8080/SAGAtoNIF/Service or to http://localhost:8080/RestrictedToNIF/RestrictedService with these parameters:
+2. (If you want to use the demo) http://demos.gsi.dit.upm.es/tomcat/SAGAtoNIF/Service or to http://demos.gsi.dit.upm.es/tomcat/RestrictedToNIF/RestrictedService with these parameters:
+
     input:
         The original file to be translated
     informat:
@@ -78,12 +80,16 @@ To access the API just send a POST request to http://localhost:8080/SAGAtoNIF/Se
 On GNU/Linux, you can test the API using curl. A request would look like this:
 ```
 curl --data "input=The text you want to analyze&intype=direct&informat=text&outformat=json-ld&algo=spFinancialEmoticon" http://localhost:8080/SAGAtoNIF/Service
+
+or
+
+curl --data "input=The text you want to analyze&intype=direct&informat=text&outformat=json-ld&algo=spFinancialEmoticon" http://demos.gsi.dit.upm.es/tomcat/SAGAtoNIF/Service
 ```
     
 On Java, you can test the API using HttpClient. A request would look like this:
 ```
 HttpClient httpclient = HttpClients.createDefault();
-HttpPost httppost = new HttpPost("http://localhost:8080/SAGAtoNIF/Service");
+HttpPost httppost = new HttpPost("http://demos.gsi.dit.upm.es/tomcat/SAGAtoNIF/Service");
     
 ArrayList<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>(4);
 params.add(new BasicNameValuePair("input", "The text that you want to analyze"));

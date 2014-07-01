@@ -60,7 +60,7 @@ To access the API just send a POST request to:
 2. (If you want to use the demo) http://demos.gsi.dit.upm.es/tomcat/SAGAtoNIF/Service or to http://demos.gsi.dit.upm.es/tomcat/RestrictedToNIF/RestrictedService with these parameters:
 
     input:
-        The original file to be translated
+        The original text to be analyzed
     informat:
         text
     intype:

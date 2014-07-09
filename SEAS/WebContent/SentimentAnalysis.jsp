@@ -15,6 +15,9 @@
  			<option value="spFinancialEmoticon">Sentiment dictionary - Sp finances and emts - Paradigma</option>
  			<option value="enFinancialEmoticon">Sentiment dictionary - En finances and emts - Loughran and McDonald</option>
  			<option value="onyx">Emotion analysis - Onyxemote</option>
+ 			<option value="ANEW2010All">Emotion analysis - ANEW 2010</option>
+ 			<option value="ANEW2010Men">Emotion analysis - ANEW 2010 Men</option>
+ 			<option value="ANEW2010Women">Emotion analysis - ANEW 2010 Women</option>
 		</select> <p> <p>
     	<input id="text" type="text" class="form-control" name="input" value="${textToAnalyze}" style="height: 122px; width: 246px">
     	<input type="hidden" name="informat" value="text">

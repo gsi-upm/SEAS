@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<ML-CONFIG>
+  <VERBOSITY level="1"/>
+  <SURROUND value="false"/>
+  <PARAMETER name="thresholdProbabilityClassification" 
+	     value="0.5"/>
+  <multiClassification2Binary method="one-vs-others"/>
+  <EVALUATION method="kfold" 
+	      runs="5"
+	      ratio="0.66" />
+  <ENGINE nickname="PAUM" 
+	  implementationName="PAUM"
+	  options=" -p 50 -n 5 -optB 0.0  "/>
+  <DATASET>
+    <INSTANCE-TYPE>comment</INSTANCE-TYPE>
+    
+    <NGRAM>
+      <NAME>ngram</NAME>
+      <NUMBER>1</NUMBER>
+      <CONSNUM>1</CONSNUM>
+      
+      <CONS-1>
+        <TYPE>Token</TYPE>
+        <FEATURE>root</FEATURE>
+      </CONS-1>
+
+      <!--
+      <CONS-2>
+        <TYPE>Token</TYPE>
+        <FEATURE>orth</FEATURE>
+      </CONS-2>
+      -->
+
+    </NGRAM>
+    
+    <ATTRIBUTE>
+      <NAME>Class</NAME>
+      <SEMTYPE>NOMINAL</SEMTYPE>
+      <TYPE>comment</TYPE>
+      <FEATURE>rating</FEATURE>
+      <POSITION>0</POSITION>
+      <CLASS/>
+    </ATTRIBUTE>
+    
+  </DATASET>
+</ML-CONFIG>

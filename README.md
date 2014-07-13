@@ -71,9 +71,6 @@ To access the API just send a POST request to http://localhost:8080/SAGAtoNIF/Se
         spFinancialEmoticon (SAGAtoNIF service)
         enFinancial (RestrictedToNIF service)
         enFinancialEmoticon (RestrictedToNIF service)
-        ANEW2010Women (RestrictedToNIF service)
-        ANEW2010Men (RestrictedToNIF service)
-        ANEW2010All (RestrictedToNIF service)
         
 On GNU/Linux, you can test the API using curl. A request would look like this:
 ```

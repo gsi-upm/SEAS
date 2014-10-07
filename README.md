@@ -1,4 +1,4 @@
-[SEAS](http://www.gsi.dit.upm.es/downloads/Logos/seas.png)
+![SEAS](http://www.gsi.dit.upm.es/downloads/Logos/seas.png)
 =====
 ![GSI Logo](http://gsi.dit.upm.es/templates/jgsi/images/logo.png)
 
